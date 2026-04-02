@@ -1,0 +1,12 @@
+{
+  "organizationId": "org_demo_001",
+  "userId": "usr_demo_001",
+  "facilityId": "fac_demo_001",
+  "projectId": "prj_demo_001",
+  "emissionFactorIds": {
+    "naturalGas": "ef_demo_natgas_001",
+    "diesel": "ef_demo_diesel_001",
+    "electricityOman": "ef_demo_grid_oman_001",
+    "ammoniaProcess": "ef_demo_ammonia_001"
+  }
+}

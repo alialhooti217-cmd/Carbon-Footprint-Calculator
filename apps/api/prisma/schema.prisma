@@ -1,0 +1,278 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  fullName     String   @map("full_name")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  memberships      OrganizationMember[]
+  createdActivities ActivityRecord[] @relation("ActivityRecordCreator")
+  calculationRuns  CalculationRun[]  @relation("CalculationRequestedBy")
+
+  @@map("users")
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String
+  industry  String?
+  country   String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  members         OrganizationMember[]
+  facilities      Facility[]
+  calculationRuns CalculationRun[]
+  recommendations Recommendation[]
+  reports         Report[]
+  uploadedFiles   UploadedFile[]
+  auditLogs       AuditLog[]
+
+  @@map("organizations")
+}
+
+model OrganizationMember {
+  id             String       @id @default(cuid())
+  organizationId String       @map("organization_id")
+  userId         String       @map("user_id")
+  role           MemberRole
+  createdAt      DateTime     @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+
+  @@unique([organizationId, userId])
+  @@map("organization_members")
+}
+
+model Facility {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  name           String
+  country        String?
+  region         String?
+  sector         String?
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  organization    Organization     @relation(fields: [organizationId], references: [id])
+  projects        Project[]
+  activityRecords ActivityRecord[]
+  calculationRuns CalculationRun[]
+  recommendations Recommendation[]
+  reports         Report[]
+  uploadedFiles   UploadedFile[]
+
+  @@map("facilities")
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  facilityId  String   @map("facility_id")
+  name        String
+  description String?
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  facility         Facility          @relation(fields: [facilityId], references: [id])
+  activityRecords  ActivityRecord[]
+  calculationRuns  CalculationRun[]
+  recommendations  Recommendation[]
+  reports          Report[]
+
+  @@map("projects")
+}
+
+model ActivityRecord {
+  id                String          @id @default(cuid())
+  facilityId        String          @map("facility_id")
+  projectId         String?         @map("project_id")
+  sourceType        SourceType      @map("source_type")
+  activityName      String          @map("activity_name")
+  quantity          Decimal         @db.Decimal(18, 4)
+  unit              String
+  normalizedQuantity Decimal?       @map("normalized_quantity") @db.Decimal(18, 4)
+  normalizedUnit    String?         @map("normalized_unit")
+  periodStart       DateTime        @map("period_start")
+  periodEnd         DateTime        @map("period_end")
+  emissionFactorId  String          @map("emission_factor_id")
+  metadataJson      Json?           @map("metadata_json")
+  createdByUserId   String          @map("created_by_user_id")
+  createdAt         DateTime        @default(now()) @map("created_at")
+  updatedAt         DateTime        @updatedAt @map("updated_at")
+  deletedAt         DateTime?       @map("deleted_at")
+
+  facility         Facility       @relation(fields: [facilityId], references: [id])
+  project          Project?       @relation(fields: [projectId], references: [id])
+  emissionFactor   EmissionFactor @relation(fields: [emissionFactorId], references: [id])
+  createdBy        User           @relation("ActivityRecordCreator", fields: [createdByUserId], references: [id])
+  calculationResults CalculationResult[]
+
+  @@map("activity_records")
+}
+
+model EmissionFactor {
+  id              String   @id @default(cuid())
+  factorName      String   @map("factor_name")
+  category        SourceType
+  region          String?
+  unitBasis       String   @map("unit_basis")
+  co2eFactor      Decimal  @map("co2e_factor") @db.Decimal(18, 6)
+  sourceReference String   @map("source_reference")
+  sourceVersion   String?  @map("source_version")
+  validFrom       DateTime @map("valid_from")
+  validTo         DateTime? @map("valid_to")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  activityRecords    ActivityRecord[]
+  calculationResults CalculationResult[]
+
+  @@map("emission_factors")
+}
+
+model CalculationRun {
+  id                String            @id @default(cuid())
+  organizationId    String            @map("organization_id")
+  facilityId        String?           @map("facility_id")
+  projectId         String?           @map("project_id")
+  fromDate          DateTime          @map("from_date")
+  toDate            DateTime          @map("to_date")
+  status            CalculationStatus
+  requestedByUserId String            @map("requested_by_user_id")
+  createdAt         DateTime          @default(now()) @map("created_at")
+  completedAt       DateTime?         @map("completed_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  facility     Facility?    @relation(fields: [facilityId], references: [id])
+  project      Project?     @relation(fields: [projectId], references: [id])
+  requestedBy  User         @relation("CalculationRequestedBy", fields: [requestedByUserId], references: [id])
+  results      CalculationResult[]
+
+  @@map("calculation_runs")
+}
+
+model CalculationResult {
+  id                 String   @id @default(cuid())
+  calculationRunId   String   @map("calculation_run_id")
+  activityRecordId   String   @map("activity_record_id")
+  emissionFactorId   String   @map("emission_factor_id")
+  co2eKg             Decimal  @map("co2e_kg") @db.Decimal(18, 6)
+  co2eTonnes         Decimal  @map("co2e_tonnes") @db.Decimal(18, 6)
+  calculationDetails Json?    @map("calculation_details_json")
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  calculationRun CalculationRun @relation(fields: [calculationRunId], references: [id])
+  activityRecord ActivityRecord @relation(fields: [activityRecordId], references: [id])
+  emissionFactor EmissionFactor @relation(fields: [emissionFactorId], references: [id])
+
+  @@map("calculation_results")
+}
+
+model Recommendation {
+  id                         String   @id @default(cuid())
+  organizationId             String   @map("organization_id")
+  facilityId                 String?  @map("facility_id")
+  projectId                  String?  @map("project_id")
+  recommendationType         String   @map("recommendation_type")
+  title                      String
+  details                    String
+  estimatedReductionKgCo2e   Decimal? @map("estimated_reduction_kg_co2e") @db.Decimal(18, 6)
+  status                     RecommendationStatus
+  createdAt                  DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  facility     Facility?    @relation(fields: [facilityId], references: [id])
+  project      Project?     @relation(fields: [projectId], references: [id])
+
+  @@map("recommendations")
+}
+
+model Report {
+  id                String       @id @default(cuid())
+  organizationId    String       @map("organization_id")
+  facilityId        String?      @map("facility_id")
+  projectId         String?      @map("project_id")
+  reportType        String       @map("report_type")
+  status            ReportStatus
+  fileUrl           String?      @map("file_url")
+  requestedByUserId String       @map("requested_by_user_id")
+  createdAt         DateTime     @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  facility     Facility?    @relation(fields: [facilityId], references: [id])
+  project      Project?     @relation(fields: [projectId], references: [id])
+
+  @@map("reports")
+}
+
+model UploadedFile {
+  id               String   @id @default(cuid())
+  organizationId   String   @map("organization_id")
+  facilityId       String?  @map("facility_id")
+  fileName         String   @map("file_name")
+  fileType         String   @map("file_type")
+  storageUrl       String   @map("storage_url")
+  uploadedByUserId String   @map("uploaded_by_user_id")
+  createdAt        DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+  facility     Facility?    @relation(fields: [facilityId], references: [id])
+
+  @@map("uploaded_files")
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String   @map("organization_id")
+  actorUserId    String   @map("actor_user_id")
+  entityType     String   @map("entity_type")
+  entityId       String   @map("entity_id")
+  action         String
+  changesJson    Json?    @map("changes_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  organization Organization @relation(fields: [organizationId], references: [id])
+
+  @@map("audit_logs")
+}
+
+enum SourceType {
+  fuel
+  electricity
+  process
+}
+
+enum MemberRole {
+  owner
+  admin
+  engineer
+  viewer
+}
+
+enum CalculationStatus {
+  pending
+  completed
+  failed
+}
+
+enum RecommendationStatus {
+  open
+  accepted
+  dismissed
+}
+
+enum ReportStatus {
+  pending
+  ready
+  failed
+}

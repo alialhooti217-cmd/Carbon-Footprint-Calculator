@@ -1,0 +1,39 @@
+{
+  "name": "carbon-footprint-calculator",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.0.0",
+  "engines": {
+    "node": ">=20.11.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "esbuild",
+      "msgpackr-extract",
+      "prisma",
+      "sharp"
+    ]
+  },
+  "scripts": {
+    "dev": "corepack pnpm -r --parallel dev",
+    "dev:web": "corepack pnpm --filter @carbon/web dev",
+    "dev:api": "corepack pnpm --filter @carbon/api dev",
+    "dev:worker": "corepack pnpm --filter @carbon/worker dev",
+    "build": "corepack pnpm -r build",
+    "lint": "corepack pnpm -r lint",
+    "test": "corepack pnpm -r test",
+    "typecheck": "corepack pnpm -r typecheck",
+    "db:generate": "corepack pnpm --filter @carbon/api prisma generate",
+    "db:migrate": "corepack pnpm --filter @carbon/api prisma migrate dev",
+    "db:seed": "corepack pnpm --filter @carbon/api prisma db seed",
+    "setup": "powershell -ExecutionPolicy Bypass -File ./scripts/bootstrap.ps1",
+    "install:workspace": "powershell -ExecutionPolicy Bypass -File ./scripts/install-workspace.ps1",
+    "start:local": "powershell -ExecutionPolicy Bypass -File ./scripts/start-local.ps1",
+    "docker:up": "docker compose -f docker-compose.yml up -d",
+    "docker:down": "docker compose -f docker-compose.yml down"
+  }
+}
