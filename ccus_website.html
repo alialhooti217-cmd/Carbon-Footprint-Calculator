@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CCUS — Carbon Capture, Utilization & Storage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0f0d;
+  --surface: #111a14;
+  --border: #1e3024;
+  --accent: #2dff6e;
+  --accent2: #00c4ff;
+  --accent3: #ff6b2d;
+  --text: #d4e8d8;
+  --muted: #5a7a60;
+  --white: #f0f7f2;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: 'DM Mono', monospace; overflow-x: hidden; line-height: 1.6; }
+body::before { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity: 0.025; pointer-events: none; z-index: 9999; }
+nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; padding: 1.2rem 3rem; border-bottom: 1px solid var(--border); background: rgba(10,15,13,0.85); backdrop-filter: blur(12px); }
+.nav-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 0.08em; color: var(--accent); }
+.nav-links { display: flex; gap: 2.5rem; list-style: none; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase; transition: color 0.2s; }
+.nav-links a:hover { color: var(--accent); }
+.hero { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 8rem 3rem 4rem; position: relative; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 50% at 80% 50%, rgba(45,255,110,0.06) 0%, transparent 70%), radial-gradient(ellipse 40% 60% at 20% 80%, rgba(0,196,255,0.05) 0%, transparent 70%); }
+.hero-grid-line { position: absolute; inset: 0; background-image: linear-gradient(var(--border) 1px, transparent 1px), linear-gradient(90deg, var(--border) 1px, transparent 1px); background-size: 60px 60px; opacity: 0.4; }
+.hero-tag { font-size: 0.68rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem; animation: fadeUp 0.8s ease both; }
+.hero-tag::before { content: ''; display: inline-block; width: 2rem; height: 1px; background: var(--accent); }
+.hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4.5rem, 12vw, 11rem); line-height: 0.92; letter-spacing: 0.02em; color: var(--white); margin-bottom: 1rem; animation: fadeUp 0.8s 0.1s ease both; }
+.hero h1 span { color: var(--accent); font-family: 'Instrument Serif', serif; font-style: italic; }
+.hero-sub { font-size: 0.85rem; color: var(--muted); max-width: 480px; line-height: 1.8; margin-bottom: 3rem; animation: fadeUp 0.8s 0.2s ease both; }
+.hero-stats { display: flex; gap: 3rem; animation: fadeUp 0.8s 0.3s ease both; }
+.stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.4rem; color: var(--white); line-height: 1; }
+.stat-num span { color: var(--accent); }
+.stat-label { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin-top: 0.25rem; }
+.scroll-hint { position: absolute; bottom: 2.5rem; left: 50%; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 0.5rem; color: var(--muted); font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; animation: bounce 2s infinite; }
+.scroll-hint::after { content: ''; display: block; width: 1px; height: 2.5rem; background: linear-gradient(to bottom, var(--muted), transparent); }
+section { padding: 6rem 3rem; max-width: 1200px; margin: 0 auto; }
+.section-label { font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; color: var(--accent); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem; }
+.section-label::before { content: ''; width: 1.5rem; height: 1px; background: var(--accent); }
+.section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.5rem, 5vw, 4rem); color: var(--white); line-height: 1; margin-bottom: 3rem; }
+.what-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2rem; }
+.what-card { background: var(--surface); border: 1px solid var(--border); border-radius: 2px; padding: 2rem; position: relative; overflow: hidden; transition: border-color 0.3s, transform 0.3s; }
+.what-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+.what-card::before { content: attr(data-num); position: absolute; top: -0.5rem; right: 1rem; font-family: 'Bebas Neue', sans-serif; font-size: 5rem; color: rgba(45,255,110,0.04); line-height: 1; pointer-events: none; }
+.card-icon { font-size: 1.8rem; margin-bottom: 1rem; }
+.card-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; color: var(--white); letter-spacing: 0.05em; margin-bottom: 0.75rem; }
+.card-text { font-size: 0.78rem; color: var(--muted); line-height: 1.9; }
+.flow-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 6rem 3rem; }
+.flow-inner { max-width: 1200px; margin: 0 auto; }
+.flow-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 3rem; position: relative; }
+.flow-steps::before { content: ''; position: absolute; top: 2.5rem; left: 12%; right: 12%; height: 1px; background: linear-gradient(to right, var(--accent), var(--accent2), var(--accent3), var(--accent)); z-index: 0; }
+.flow-step { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 1rem; position: relative; z-index: 1; }
+.step-circle { width: 5rem; height: 5rem; border-radius: 50%; border: 1px solid var(--border); background: var(--bg); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.25rem; transition: border-color 0.3s; }
+.flow-step:hover .step-circle { border-color: var(--accent); }
+.step-num { font-family: 'Bebas Neue', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--accent); margin-bottom: 0.4rem; }
+.step-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--white); margin-bottom: 0.5rem; letter-spacing: 0.05em; }
+.step-desc { font-size: 0.72rem; color: var(--muted); line-height: 1.8; }
+.methods-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); margin-top: 2.5rem; }
+.method-cell { background: var(--bg); padding: 2rem; transition: background 0.3s; }
+.method-cell:hover { background: var(--surface); }
+.method-tag { display: inline-block; font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; padding: 0.2rem 0.6rem; border: 1px solid; margin-bottom: 1rem; border-radius: 1px; }
+.tag-pre { color: var(--accent); border-color: var(--accent); }
+.tag-post { color: var(--accent2); border-color: var(--accent2); }
+.tag-oxy { color: var(--accent3); border-color: var(--accent3); }
+.tag-dac { color: #c084fc; border-color: #c084fc; }
+.tag-bio { color: #fbbf24; border-color: #fbbf24; }
+.tag-mem { color: #34d399; border-color: #34d399; }
+.method-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; color: var(--white); letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+.method-eff { font-size: 0.65rem; color: var(--muted); margin-bottom: 1rem; font-style: italic; }
+.method-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.9; }
+.method-pros { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.pro-item { font-size: 0.7rem; color: var(--text); display: flex; gap: 0.5rem; }
+.pro-item::before { content: '→'; color: var(--accent); flex-shrink: 0; }
+.storage-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 2.5rem; }
+.storage-card { border: 1px solid var(--border); padding: 2rem; position: relative; overflow: hidden; background: linear-gradient(135deg, var(--surface), var(--bg)); }
+.storage-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 3px; }
+.bar-geo { background: var(--accent); }
+.bar-ocean { background: var(--accent2); }
+.bar-mineral { background: var(--accent3); }
+.bar-eor { background: #fbbf24; }
+.storage-capacity { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; color: var(--white); line-height: 1; margin-bottom: 0.25rem; }
+.storage-unit { font-size: 0.65rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.75rem; }
+.storage-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--white); letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+.storage-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.85; }
+.util-section { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding: 6rem 3rem; }
+.util-inner { max-width: 1200px; margin: 0 auto; }
+.util-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 2.5rem; }
+.util-item { text-align: center; padding: 1.5rem 1rem; border: 1px solid var(--border); transition: border-color 0.3s, background 0.3s; cursor: default; }
+.util-item:hover { border-color: var(--accent2); background: rgba(0,196,255,0.03); }
+.util-icon { font-size: 2rem; margin-bottom: 1rem; }
+.util-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--white); letter-spacing: 0.08em; margin-bottom: 0.4rem; }
+.util-text { font-size: 0.7rem; color: var(--muted); line-height: 1.75; }
+.challenges-list { display: flex; flex-direction: column; gap: 1rem; margin-top: 2.5rem; }
+.challenge-row { display: grid; grid-template-columns: 3rem 1fr auto; align-items: center; gap: 1.5rem; padding: 1.25rem 1.5rem; border: 1px solid var(--border); transition: border-color 0.3s; }
+.challenge-row:hover { border-color: var(--accent3); }
+.ch-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.5rem; color: var(--accent3); opacity: 0.5; }
+.ch-title { font-size: 0.82rem; color: var(--white); margin-bottom: 0.2rem; font-weight: 500; }
+.ch-desc { font-size: 0.72rem; color: var(--muted); }
+.severity { font-size: 0.65rem; letter-spacing: 0.1em; text-transform: uppercase; padding: 0.2rem 0.8rem; border: 1px solid; flex-shrink: 0; }
+.sev-high { color: var(--accent3); border-color: var(--accent3); }
+.sev-med { color: #fbbf24; border-color: #fbbf24; }
+.sev-low { color: var(--muted); border-color: var(--muted); }
+.metrics-strip { background: var(--accent); padding: 3rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; text-align: center; }
+.metric-val { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--bg); line-height: 1; }
+.metric-lbl { font-size: 0.65rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(10,15,13,0.6); margin-top: 0.3rem; }
+.industry-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--border); margin-top: 2.5rem; }
+.industry-cell { background: var(--bg); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.ind-name { font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--white); letter-spacing: 0.05em; }
+.ind-bar-wrap { height: 4px; background: var(--border); overflow: hidden; }
+.ind-bar { height: 100%; background: linear-gradient(to right, var(--accent), var(--accent2)); transition: width 1.5s ease; }
+.ind-pct { font-size: 0.68rem; color: var(--accent); }
+.ind-desc { font-size: 0.7rem; color: var(--muted); line-height: 1.7; }
+footer { border-top: 1px solid var(--border); padding: 3rem; display: flex; justify-content: space-between; align-items: center; color: var(--muted); font-size: 0.68rem; letter-spacing: 0.08em; }
+.footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.2rem; color: var(--accent); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes bounce { 0%, 100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(6px); } }
+.fade-in { opacity: 0; transform: translateY(24px); transition: opacity 0.7s ease, transform 0.7s ease; }
+.fade-in.visible { opacity: 1; transform: none; }
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">CCUS</div>
+  <ul class="nav-links">
+    <li><a href="#what">Overview</a></li>
+    <li><a href="#capture">Capture</a></li>
+    <li><a href="#storage">Storage</a></li>
+    <li><a href="#utilization">Utilization</a></li>
+    <li><a href="#challenges">Challenges</a></li>
+    <li><a href="#industries">Industries</a></li>
+  </ul>
+</nav>
+
+<div class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid-line"></div>
+  <div class="hero-tag">Chemical Engineering Reference — CCUS Fundamentals</div>
+  <h1>Carbon <span>Capture</span><br>Utilization<br>& Storage</h1>
+  <p class="hero-sub">A technical primer on CCUS technologies, processes, and industrial applications — for chemical engineers navigating the energy transition.</p>
+  <div class="hero-stats">
+    <div class="stat-item">
+      <div class="stat-num">37<span>Gt</span></div>
+      <div class="stat-label">Global CO₂/yr</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">6<span>Gt</span></div>
+      <div class="stat-label">CCUS Potential/yr by 2050</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">45<span>+</span></div>
+      <div class="stat-label">Large-scale facilities</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num">90<span>%</span></div>
+      <div class="stat-label">Max capture efficiency</div>
+    </div>
+  </div>
+  <div class="scroll-hint">Scroll</div>
+</div>
+
+<section id="what">
+  <div class="section-label">01 — Overview</div>
+  <h2 class="section-title">What is CCUS?</h2>
+  <p class="card-text" style="max-width:700px; margin-bottom:2.5rem; font-size:0.82rem; line-height:2;">Carbon Capture, Utilization, and Storage (CCUS) is a suite of technologies that intercept CO₂ at the point of emission or directly from the atmosphere, then either permanently store it underground or convert it into useful products. It is considered essential for decarbonizing hard-to-abate sectors.</p>
+  <div class="what-grid fade-in">
+    <div class="what-card" data-num="C">
+      <div class="card-icon">⚗️</div>
+      <div class="card-title">Carbon Capture</div>
+      <div class="card-text">Separation of CO₂ from flue gas or process streams using chemical absorption (amine scrubbing), physical adsorption, membranes, or cryogenic distillation. Typical removal efficiency: 85–95%.</div>
+    </div>
+    <div class="what-card" data-num="C">
+      <div class="card-icon">🔄</div>
+      <div class="card-title">CO₂ Compression & Transport</div>
+      <div class="card-text">Captured CO₂ is dehydrated, compressed to supercritical phase (>73 bar, >31°C), and transported via pipeline, ship, or truck to storage or utilization sites.</div>
+    </div>
+    <div class="what-card" data-num="U">
+      <div class="card-icon">⚡</div>
+      <div class="card-title">Carbon Utilization</div>
+      <div class="card-text">CO₂ as a feedstock: e-fuels, methanol, urea synthesis, enhanced oil recovery, concrete curing, food-grade CO₂, and emerging pathways like CO₂ to polymers or jet fuel (SAF).</div>
+    </div>
+    <div class="what-card" data-num="S">
+      <div class="card-icon">🌍</div>
+      <div class="card-title">Carbon Storage</div>
+      <div class="card-text">Permanent geological sequestration in deep saline aquifers (>800m), depleted oil/gas reservoirs, or basaltic formations through mineral trapping reactions over geological time.</div>
+    </div>
+  </div>
+</section>
+
+<div class="flow-section">
+  <div class="flow-inner">
+    <div class="section-label">02 — Process</div>
+    <h2 class="section-title">End-to-End Process Flow</h2>
+    <div class="flow-steps fade-in">
+      <div class="flow-step">
+        <div class="step-circle">🏭</div>
+        <div class="step-num">Step 01</div>
+        <div class="step-title">Emission Source</div>
+        <div class="step-desc">Power plants, cement, steel, fertilizer, refinery — point source or atmosphere</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-circle">🧪</div>
+        <div class="step-num">Step 02</div>
+        <div class="step-title">Capture Unit</div>
+        <div class="step-desc">Pre/post-combustion or oxy-fuel; absorber/stripper columns; regeneration via steam</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-circle">🔧</div>
+        <div class="step-num">Step 03</div>
+        <div class="step-title">Compression</div>
+        <div class="step-desc">Multi-stage compression to ~150 bar; dehydration to avoid hydrate formation in pipelines</div>
+      </div>
+      <div class="flow-step">
+        <div class="step-circle">♾️</div>
+        <div class="step-num">Step 04</div>
+        <div class="step-title">Store or Use</div>
+        <div class="step-desc">Geological injection >800 m depth, or conversion to products via chemical/biological pathways</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="capture">
+  <div class="section-label">03 — Capture Technologies</div>
+  <h2 class="section-title">Capture Methods</h2>
+  <div class="methods-grid fade-in">
+    <div class="method-cell">
+      <div class="method-tag tag-post">Post-Combustion</div>
+      <div class="method-title">Amine Scrubbing</div>
+      <div class="method-eff">Efficiency: 85–95% | Maturity: Commercial</div>
+      <div class="method-desc">Flue gas contacts MEA or advanced solvents in absorber column. CO₂ reacts chemically with amine. Rich solvent is thermally regenerated in stripper releasing pure CO₂.</div>
+      <div class="method-pros">
+        <div class="pro-item">Retrofittable to existing plants</div>
+        <div class="pro-item">High selectivity for CO₂</div>
+        <div class="pro-item">Energy penalty: 3–4 GJ/tCO₂</div>
+      </div>
+    </div>
+    <div class="method-cell">
+      <div class="method-tag tag-pre">Pre-Combustion</div>
+      <div class="method-title">Shift + Absorption</div>
+      <div class="method-eff">Efficiency: 85–90% | Maturity: Commercial</div>
+      <div class="method-desc">Fuel is reformed to syngas (H₂ + CO). Water-gas shift converts CO → CO₂. CO₂ removed via physical solvents (Selexol, Rectisol) at high pressure. H₂ fuel remains.</div>
+      <div class="method-pros">
+        <div class="pro-item">Lower energy penalty vs post-combustion</div>
+        <div class="pro-item">High CO₂ partial pressure aids separation</div>
+        <div class="pro-item">Enables blue hydrogen production</div>
+      </div>
+    </div>
+    <div class="method-cell">
+      <div class="method-tag tag-oxy">Oxy-Fuel</div>
+      <div class="method-title">Oxy-Fuel Combustion</div>
+      <div class="method-eff">Efficiency: >95% | Maturity: Demo-scale</div>
+      <div class="method-desc">Combustion in pure O₂ (from ASU) instead of air. Flue gas is nearly pure CO₂ + H₂O. Water condensed out → CO₂ ready for compression. No separation column needed.</div>
+      <div class="method-pros">
+        <div class="pro-item">Near-pure CO₂ stream directly</div>
+        <div class="pro-item">Eliminates NOx formation</div>
+        <div class="pro-item">ASU is energy-intensive</div>
+      </div>
+    </div>
+    <div class="method-cell">
+      <div class="method-tag tag-dac">Direct Air Capture</div>
+      <div class="method-title">DAC — Solid/Liquid</div>
+      <div class="method-eff">CO₂ at 420 ppm | Maturity: Early Commercial</div>
+      <div class="method-desc">Contactors pull atmospheric CO₂ using solid sorbents (temperature swing) or liquid KOH (calcium caustic loop). Very energy intensive but enables negative emissions from anywhere.</div>
+      <div class="method-pros">
+        <div class="pro-item">Location-independent, no point source</div>
+        <div class="pro-item">Enables net-negative emissions</div>
+        <div class="pro-item">Current cost: $300–1000/tCO₂</div>
+      </div>
+    </div>
+    <div class="method-cell">
+      <div class="method-tag tag-mem">Membrane Separation</div>
+      <div class="method-title">Polymeric Membranes</div>
+      <div class="method-eff">Efficiency: 60–80% | Maturity: Emerging</div>
+      <div class="method-desc">Semi-permeable membranes with selective permeability for CO₂ vs N₂/CH₄. No regeneration needed — continuous operation. Best for high CO₂ concentration streams.</div>
+      <div class="method-pros">
+        <div class="pro-item">No phase change — compact footprint</div>
+        <div class="pro-item">Low maintenance, modular</div>
+        <div class="pro-item">Limited purity without multi-stage</div>
+      </div>
+    </div>
+    <div class="method-cell">
+      <div class="method-tag tag-bio">Bioenergy + CCS</div>
+      <div class="method-title">BECCS</div>
+      <div class="method-eff">Net-negative | Maturity: Emerging</div>
+      <div class="method-desc">Biomass absorbs CO₂ during growth. At conversion (combustion, fermentation), CO₂ is captured and stored. Biogenic carbon removal = net-negative. Fermentation CO₂ is near-pure.</div>
+      <div class="method-pros">
+        <div class="pro-item">Cheapest negative emission pathway</div>
+        <div class="pro-item">Ethanol fermentation CO₂ is near-pure</div>
+        <div class="pro-item">Land-use constraints apply</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="metrics-strip fade-in">
+  <div><div class="metric-val">200+</div><div class="metric-lbl">CCUS Projects Globally</div></div>
+  <div><div class="metric-val">50Mt</div><div class="metric-lbl">CO₂ Captured Annually (2024)</div></div>
+  <div><div class="metric-val">$50B</div><div class="metric-lbl">Projected CCUS Investment by 2030</div></div>
+  <div><div class="metric-val">1.5°C</div><div class="metric-lbl">CCUS Critical for Paris Target</div></div>
+</div>
+
+<section id="storage">
+  <div class="section-label">04 — Storage</div>
+  <h2 class="section-title">Geological Storage Options</h2>
+  <div class="storage-grid fade-in">
+    <div class="storage-card">
+      <div class="storage-bar bar-geo"></div>
+      <div style="padding-left:1rem;">
+        <div class="storage-capacity">8,000+</div>
+        <div class="storage-unit">Gt CO₂ — Global Capacity Estimate</div>
+        <div class="storage-title">Deep Saline Aquifers</div>
+        <div class="storage-desc">Most abundant storage type. CO₂ injected >800m into porous rock capped by impermeable shale. Four trapping mechanisms: structural, residual, dissolution, and mineral trapping. Monitoring via 4D seismic and InSAR.</div>
+      </div>
+    </div>
+    <div class="storage-card">
+      <div class="storage-bar bar-eor"></div>
+      <div style="padding-left:1rem;">
+        <div class="storage-capacity">135</div>
+        <div class="storage-unit">Gt CO₂ — Depleted Reservoir Capacity</div>
+        <div class="storage-title">Enhanced Oil Recovery (EOR)</div>
+        <div class="storage-desc">CO₂ injected into producing or depleted oil reservoirs swells oil, reduces viscosity, and improves recovery by 15–20%. CO₂ remains sequestered. Revenue offsets capture costs — most economically mature pathway.</div>
+      </div>
+    </div>
+    <div class="storage-card">
+      <div class="storage-bar bar-ocean"></div>
+      <div style="padding-left:1rem;">
+        <div class="storage-capacity">2 yrs</div>
+        <div class="storage-unit">Mineralization time in basalt</div>
+        <div class="storage-title">Basalt Mineral Trapping</div>
+        <div class="storage-desc">CO₂ dissolved in water and injected into basaltic rock reacts to form stable carbonate minerals (calcite, magnesite) within 2 years. CarbFix project in Iceland demonstrated this. Permanent — no long-term monitoring needed.</div>
+      </div>
+    </div>
+    <div class="storage-card">
+      <div class="storage-bar bar-mineral"></div>
+      <div style="padding-left:1rem;">
+        <div class="storage-capacity">>800</div>
+        <div class="storage-unit">m — minimum injection depth</div>
+        <div class="storage-title">Depleted Gas Fields</div>
+        <div class="storage-desc">Proven structural integrity from decades of natural gas containment. Excellent geological understanding from production data. Lower risk vs saline aquifers. CO₂ EGR (enhanced gas recovery) also being explored.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="util-section" id="utilization">
+  <div class="util-inner">
+    <div class="section-label">05 — Utilization</div>
+    <h2 class="section-title">CO₂ as a Feedstock</h2>
+    <p class="card-text" style="max-width:650px; margin-bottom:0; font-size:0.78rem; line-height:2; color:#5a7a60;">CO₂ can be chemically, electrochemically, or biologically converted into fuels, chemicals, and materials — closing the carbon loop and generating economic value from emissions.</p>
+    <div class="util-grid fade-in">
+      <div class="util-item">
+        <div class="util-icon">🔵</div>
+        <div class="util-title">Methanol</div>
+        <div class="util-text">CO₂ + 3H₂ → CH₃OH + H₂O. Used in fuel blending, chemical feedstock, marine fuel. George Olah Plant (Iceland) — commercial scale.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">✈️</div>
+        <div class="util-title">Synthetic Fuels (SAF)</div>
+        <div class="util-text">Fischer-Tropsch or methanol-to-jet pathways using CO₂ + green H₂. Life-cycle emissions 70–80% lower than conventional jet fuel.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🌾</div>
+        <div class="util-title">Urea & Fertilizer</div>
+        <div class="util-text">CO₂ + NH₃ → Urea. Largest current CCU market (~2 Gt CO₂/yr). CO₂ sourced from steam methane reformer off-gas at fertilizer plants.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🏗️</div>
+        <div class="util-title">Concrete Curing</div>
+        <div class="util-text">CO₂ injected during curing mineralizes permanently. Improves compressive strength 10–15%. CarbonCure Technologies — commercial scale globally.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🧪</div>
+        <div class="util-title">Polymers & Plastics</div>
+        <div class="util-text">CO₂-based polycarbonates and polyols. Covestro Dream Production — CO₂ replaces 20% petroleum feedstock in polyurethane foams.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">⚡</div>
+        <div class="util-title">Power-to-X</div>
+        <div class="util-text">Electrolysis of H₂O + CO₂ reduction (reverse WGS) → syngas for further synthesis. Enables seasonal energy storage via e-fuels.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🍺</div>
+        <div class="util-title">Food & Beverage</div>
+        <div class="util-text">Food-grade CO₂ for carbonation, modified atmosphere packaging, dry ice. High purity requirement. Small but established and stable market.</div>
+      </div>
+      <div class="util-item">
+        <div class="util-icon">🌿</div>
+        <div class="util-title">Enhanced Agriculture</div>
+        <div class="util-text">CO₂ enrichment in greenhouses increases crop yields 20–40%. Direct use — no conversion. Localized demand near industrial point sources.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section id="challenges">
+  <div class="section-label">06 — Challenges</div>
+  <h2 class="section-title">Key Engineering Challenges</h2>
+  <div class="challenges-list fade-in">
+    <div class="challenge-row">
+      <div class="ch-num">01</div>
+      <div class="ch-text">
+        <div class="ch-title">Energy Penalty of Capture</div>
+        <div class="ch-desc">Amine regeneration requires 3–4 GJ/tCO₂. For a 1 GW coal plant, this reduces net output by ~25–30%. Advanced solvents (piperazine, ionic liquids) target &lt;2 GJ/tCO₂.</div>
+      </div>
+      <div class="severity sev-high">High</div>
+    </div>
+    <div class="challenge-row">
+      <div class="ch-num">02</div>
+      <div class="ch-text">
+        <div class="ch-title">Cost — $/tCO₂ Captured</div>
+        <div class="ch-desc">Post-combustion: $50–100/t. DAC: $300–1000/t. IEA target for DAC is &lt;$100/t by 2030. Policy support (45Q tax credits) and scale are reducing costs steadily.</div>
+      </div>
+      <div class="severity sev-high">High</div>
+    </div>
+    <div class="challenge-row">
+      <div class="ch-num">03</div>
+      <div class="ch-text">
+        <div class="ch-title">Pipeline Infrastructure</div>
+        <div class="ch-desc">Supercritical CO₂ is corrosive to mild steel in presence of water. Requires dehydration and corrosion-resistant materials. US CO₂ pipeline network needs 10× expansion for net-zero scenario.</div>
+      </div>
+      <div class="severity sev-high">High</div>
+    </div>
+    <div class="challenge-row">
+      <div class="ch-num">04</div>
+      <div class="ch-text">
+        <div class="ch-title">Long-term Storage Integrity</div>
+        <div class="ch-desc">Caprock integrity, induced seismicity from injection pressure, and wellbore cement degradation are key risks. Monitoring requirements extend 50–100 years post-injection.</div>
+      </div>
+      <div class="severity sev-med">Medium</div>
+    </div>
+    <div class="challenge-row">
+      <div class="ch-num">05</div>
+      <div class="ch-text">
+        <div class="ch-title">Solvent Degradation & Emissions</div>
+        <div class="ch-desc">MEA degrades thermally and oxidatively forming nitrosamines (carcinogenic). Requires reclaimer units and solvent makeup. Advanced amines (piperazine, AMP blends) show improved stability.</div>
+      </div>
+      <div class="severity sev-med">Medium</div>
+    </div>
+    <div class="challenge-row">
+      <div class="ch-num">06</div>
+      <div class="ch-text">
+        <div class="ch-title">Public Acceptance & Regulation</div>
+        <div class="ch-desc">Social license for geological storage sites; liability frameworks for long-term CO₂ containment. Regulatory clarity needed for carbon markets and cross-border CO₂ transport.</div>
+      </div>
+      <div class="severity sev-low">Policy</div>
+    </div>
+  </div>
+</section>
+
+<section id="industries">
+  <div class="section-label">07 — Industries</div>
+  <h2 class="section-title">Hard-to-Abate Sectors</h2>
+  <p class="card-text" style="max-width:600px; margin-bottom:0; font-size:0.78rem; line-height:2; color:#5a7a60;">CCUS is considered essential — not optional — for these sectors where direct electrification cannot eliminate process emissions.</p>
+  <div class="industry-grid fade-in">
+    <div class="industry-cell">
+      <div class="ind-name">Cement</div>
+      <div class="ind-bar-wrap"><div class="ind-bar" style="width:0%" data-target="65%"></div></div>
+      <div class="ind-pct">~65% process CO₂ (calcination)</div>
+      <div class="ind-desc">CaCO₃ → CaO + CO₂ cannot be avoided by switching fuels. CCUS is the only decarbonization route for process emissions. Heidelberg, Holcim piloting.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="ind-name">Steel (BF / DRI)</div>
+      <div class="ind-bar-wrap"><div class="ind-bar" style="width:0%" data-target="55%"></div></div>
+      <div class="ind-pct">~7% of global CO₂</div>
+      <div class="ind-desc">Blast furnace off-gas is CO₂-rich. Top gas recycling + CCS. Green steel (H₂-DRI) avoids CO₂ but CCUS bridges transition. SSAB, ArcelorMittal active projects.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="ind-name">Ammonia & Fertilizer</div>
+      <div class="ind-bar-wrap"><div class="ind-bar" style="width:0%" data-target="48%"></div></div>
+      <div class="ind-pct">1.8% of global CO₂</div>
+      <div class="ind-desc">SMR produces high-purity CO₂ stream — lowest-cost CCS opportunity. Blue ammonia already commercial. Saudi Arabia, Australia exporting blue NH₃ to Asia.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="ind-name">Natural Gas Power</div>
+      <div class="ind-bar-wrap"><div class="ind-bar" style="width:0%" data-target="72%"></div></div>
+      <div class="ind-pct">~20% of global CO₂</div>
+      <div class="ind-desc">Post-combustion amine scrubbing retrofits viable. Allam-Fetvedt cycle (NET Power) uses oxy-fuel with supercritical CO₂ turbine — near-zero emissions at competitive LCOE.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="ind-name">Refining & Petrochemicals</div>
+      <div class="ind-bar-wrap"><div class="ind-bar" style="width:0%" data-target="42%"></div></div>
+      <div class="ind-pct">~4% of global CO₂</div>
+      <div class="ind-desc">Multiple point sources on one site — hub-and-cluster model. Rotterdam CCUS cluster (Shell, Air Liquide) aggregates emissions for shared pipeline to North Sea storage.</div>
+    </div>
+    <div class="industry-cell">
+      <div class="ind-name">Waste-to-Energy / BECCS</div>
+      <div class="ind-bar-wrap"><div class="ind-bar" style="width:0%" data-target="35%"></div></div>
+      <div class="ind-pct">Net-negative pathway</div>
+      <div class="ind-desc">Biogenic CO₂ from combustion or fermentation captured = negative emissions. Stockholm Exergi BECCS project targets 800,000 t/yr removal. Lowest-cost negative emission route.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">CCUS</div>
+  <div>Carbon Capture, Utilization & Storage — Chemical Engineering Reference</div>
+  <div>IEA · IPCC · MIT Energy · DOE NETL</div>
+</footer>
+
+<script>
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(el => {
+    if (el.isIntersecting) el.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+const barObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.ind-bar').forEach(bar => {
+        const target = bar.getAttribute('data-target') || bar.style.width;
+        bar.style.width = '0%';
+        setTimeout(() => { bar.style.width = target; }, 300);
+      });
+      barObserver.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+const ig = document.querySelector('.industry-grid');
+if (ig) barObserver.observe(ig);
+</script>
+</body>
+</html>
